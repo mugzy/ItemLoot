@@ -7,7 +7,12 @@ $filePath = $FileBrowser.FileName
 $steamId = [Microsoft.VisualBasic.Interaction]::InputBox("Victims SteamID", "SteamID", "")
 
 if ($steamId){
-    $datePattern = '(\[\d{2}/\d{2} \d{2}:\d{2}:\d{2}\]) T:ItemMove(.*) S:'+$steamId+' (\[.*\]) T:0 \[0, 0, 0\]'
+    if ($steamId -eq 'all'){
+        $datePattern = '(\[\d{2}/\d{2} \d{2}:\d{2}:\d{2}\]) T:ItemMove(.*) S:(.*) (\[.*\]) T:0 \[0, 0, 0\]'}
+    else{
+        $datePattern = '(\[\d{2}/\d{2} \d{2}:\d{2}:\d{2}\]) T:ItemMove(.*) S:('+$steamId+') (\[.*\]) T:0 \[0, 0, 0\]'
+        
+    }
     $extraPattern = 'Extra:(\d+)x (.+) (?<!moved )from (.+)'
 
     $date = $null
@@ -19,7 +24,8 @@ if ($steamId){
 
         if ($line -match $datePattern) {
             $date = $Matches[1]
-
+            $name = $Matches[2]
+            $PlayerID = $Matches[3]
             if ($i -lt $lines.Length - 1) {
                 $nextLine = $lines[$i+1]
 
@@ -29,6 +35,8 @@ if ($steamId){
                     $container = $Matches[3]
                     $entry = [PSCustomObject]@{
                         Date = $date
+                        PlayerID = $PlayerID
+                        Name = $name
                         Quantity = $quantity
                         Item = $item
                         Container = $container
@@ -43,5 +51,6 @@ if ($steamId){
     Write-Host ""
     Write-Host "Report saved to $writefile\$steamId-$date.txt"
     $output | Format-Table -AutoSize | Out-File "$writefile\\$steamId-$date.txt"
+    $output | Export-Csv -Path "$writefile\\$steamId-$date.csv" -NoTypeInformation
     &notepad.exe "$writefile\\$steamId-$date.txt"
 }
