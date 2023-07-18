@@ -2,12 +2,12 @@ Add-Type -AssemblyName System.Windows.Forms
 $FileBrowser = New-Object System.Windows.Forms.OpenFileDialog -Property @{ InitialDirectory = $MyInvocation.MyCommand.Path}
 $null = $FileBrowser.ShowDialog()
 $filePath = $FileBrowser.FileName
-
+$steamId = 1
 [System.Reflection.Assembly]::LoadWithPartialName('Microsoft.VisualBasic') | Out-Null
 $steamId = [Microsoft.VisualBasic.Interaction]::InputBox("Victims SteamID", "SteamID", "")
 
 if ($steamId){
-    if ($steamId -eq 'all'){
+    if ($steamId.length -ne 17){
         $datePattern = '(\[\d{2}/\d{2} \d{2}:\d{2}:\d{2}\]) T:ItemMove(.*) S:(.*) (\[.*\]) T:0 \[0, 0, 0\]'}
     else{
         $datePattern = '(\[\d{2}/\d{2} \d{2}:\d{2}:\d{2}\]) T:ItemMove(.*) S:('+$steamId+') (\[.*\]) T:0 \[0, 0, 0\]'
