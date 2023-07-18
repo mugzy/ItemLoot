@@ -4,7 +4,7 @@ $null = $FileBrowser.ShowDialog()
 $filePath = $FileBrowser.FileName
 $steamId = 1
 [System.Reflection.Assembly]::LoadWithPartialName('Microsoft.VisualBasic') | Out-Null
-$steamId = [Microsoft.VisualBasic.Interaction]::InputBox("Victims SteamID", "SteamID", "")
+$steamId = [Microsoft.VisualBasic.Interaction]::InputBox("Victims SteamID", "SteamID", "1")
 
 if ($steamId){
     if ($steamId.length -ne 17){
