@@ -11,7 +11,6 @@ if ($steamId){
         $datePattern = '(\[\d{2}/\d{2} \d{2}:\d{2}:\d{2}\]) T:ItemMove(.*) S:(.*) (\[.*\]) T:0 \[0, 0, 0\]'}
     else{
         $datePattern = '(\[\d{2}/\d{2} \d{2}:\d{2}:\d{2}\]) T:ItemMove(.*) S:('+$steamId+') (\[.*\]) T:0 \[0, 0, 0\]'
-        
     }
     $extraPattern = 'Extra:(\d+)x (.+) (?<!moved )from (.+)'
 
