@@ -6,7 +6,7 @@ $steamId = 1
 [System.Reflection.Assembly]::LoadWithPartialName('Microsoft.VisualBasic') | Out-Null
 $steamId = [Microsoft.VisualBasic.Interaction]::InputBox("Players SteamID or 1 for all", "SteamID", "1")
 $directionSelection = [Microsoft.VisualBasic.Interaction]::InputBox("Enter All, To, or From", "Direction", "All")
-$t = ".*"
+
 
 if ($steamId){
     if ($steamId.length -ne 17){
@@ -65,7 +65,7 @@ if ($nextLine -match $pattern) {
 
     }
     $writefile = (Get-Item $filePath ).DirectoryName
-    $date = Get-Date –format 'yyyyMMdd_HHmmss'
+    $date = Get-Date ï¿½format 'yyyyMMdd_HHmmss'
     Write-Host ""
     Write-Host "Report saved to $writefile\$steamId-$date.txt"
     $output | Format-Table -AutoSize | Out-File "$writefile\\$steamId-$date.txt"
