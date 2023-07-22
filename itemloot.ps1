@@ -4,7 +4,9 @@ $null = $FileBrowser.ShowDialog()
 $filePath = $FileBrowser.FileName
 $steamId = 1
 [System.Reflection.Assembly]::LoadWithPartialName('Microsoft.VisualBasic') | Out-Null
-$steamId = [Microsoft.VisualBasic.Interaction]::InputBox("Players SteamID or blank for all", "SteamID", "1")
+$steamId = [Microsoft.VisualBasic.Interaction]::InputBox("Players SteamID or 1 for all", "SteamID", "1")
+$directionSelection = [Microsoft.VisualBasic.Interaction]::InputBox("Enter All, To, or From", "Direction", "All")
+$t = ".*"
 
 if ($steamId){
     if ($steamId.length -ne 17){
@@ -14,8 +16,8 @@ if ($steamId){
     }
     $extraPatternFrom = 'Extra:(\d+)x (.+) (?<!moved )from (.+)'
     $extraPatternTo = 'Extra:(\d+)x (.+) moved to (.+)'
-    $direction = null
     $date = $null
+    $direction = $null
     $output = @()
 
     $lines = Get-Content $filePath
@@ -23,10 +25,10 @@ if ($steamId){
         $line = $lines[$i]
 
         if ($line -match $datePattern) {
-            if ($Matches[5] -eq "[0, 0, 0]"){
+            if ($Matches[5] -eq "[0, 0, 0]" -and ($directionSelection -eq "From" -or $directionSelection -eq "All")){
                 $direction = "FROM"
                 }
-            else{
+            elseif ($directionSelection -eq "To" -or $directionSelection -eq "All"){
                 $direction = "TO"
                 }
             
