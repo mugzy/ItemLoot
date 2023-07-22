@@ -8,12 +8,13 @@ $steamId = [Microsoft.VisualBasic.Interaction]::InputBox("Players SteamID or bla
 
 if ($steamId){
     if ($steamId.length -ne 17){
-        $datePattern = '(\[\d{2}/\d{2} \d{2}:\d{2}:\d{2}\]) T:ItemMove(.*) S:(.*) (\[.*\]) T:0 \[0, 0, 0\]'}
+        $datePattern = '(\[\d{2}/\d{2} \d{2}:\d{2}:\d{2}\]) T:ItemMove(.*) S:(.*) (\[.*\]) T:0 (\[-?\d+(\.\d+)?, -?\d+(\.\d+)?, -?\d+(\.\d+)?\])'}
     else{
-        $datePattern = '(\[\d{2}/\d{2} \d{2}:\d{2}:\d{2}\]) T:ItemMove(.*) S:('+$steamId+') (\[.*\]) T:0 \[0, 0, 0\]'
+        $datePattern = '(\[\d{2}/\d{2} \d{2}:\d{2}:\d{2}\]) T:ItemMove(.*) S:('+$steamId+') (\[.*\]) T:0 (\[-?\d+(\.\d+)?, -?\d+(\.\d+)?, -?\d+(\.\d+)?\])'
     }
-    $extraPattern = 'Extra:(\d+)x (.+) (?<!moved )from (.+)'
-
+    $extraPatternFrom = 'Extra:(\d+)x (.+) (?<!moved )from (.+)'
+    $extraPatternTo = 'Extra:(\d+)x (.+) moved to (.+)'
+    $direction = null
     $date = $null
     $output = @()
 
@@ -22,6 +23,41 @@ if ($steamId){
         $line = $lines[$i]
 
         if ($line -match $datePattern) {
+            if ($Matches[4] = "[0, 0, 0]"){
+                $direction = "FROM"
+            else
+                $direction = "TO"
+            }
+            $date = $Matches[1]
+            $name = $Matches[2]
+            $PlayerID = $Matches[3]
+            if ($i -lt $lines.Length - 1) {
+                $nextLine = $lines[$i+1]
+
+if ($direction -eq "FROM") {
+    $pattern = $extraPattern
+} elseif ($direction -eq "TO") {
+    $pattern = $extraPatternTo
+}
+
+if ($nextLine -match $pattern) {
+    $quantity = $Matches[1]
+    $item = $Matches[2]
+    $container = $Matches[3]
+    $entry = [PSCustomObject]@{
+        Date = $date
+        PlayerID = $PlayerID
+        Name = $name
+        Quantity = $quantity
+        Item = $item
+        Container = $container
+        Direction = $direction
+    }
+    $output += $entry
+}
+            }
+        }
+        if ($line -match $datePatternTo) {
             $date = $Matches[1]
             $name = $Matches[2]
             $PlayerID = $Matches[3]
@@ -39,6 +75,7 @@ if ($steamId){
                         Quantity = $quantity
                         Item = $item
                         Container = $container
+                        Direction = "TO"
                     }
                     $output += $entry
                 } 
