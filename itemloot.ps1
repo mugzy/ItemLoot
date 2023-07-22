@@ -15,7 +15,9 @@ if ($steamId) {
         $datePattern = '(\[\d{2}\/\d{2} \d{2}:\d{2}:\d{2}\]) T:ItemMove(.*) S:(' + $steamId + ') (\[.*\]) T:.* (\[-?\d+(\.\d+)?, -?\d+(\.\d+)?, -?\d+(\.\d+)?\])'
     }
     $extraPatternFrom = 'Extra:(\d+)x (.+) (?<!moved )from (.+)'
+    $extraPatternFromPicked = 'Extra:picked up (\d+)x (.*)'
     $extraPatternTo = 'Extra:(\d+)x (.+) moved to (.+)'
+    $extraPatternToDropped = 'Extra:dropped (\d+)x (.*)'
     $date = $null
     $direction = $null
     $output = @()
@@ -23,8 +25,9 @@ if ($steamId) {
     $lines = Get-Content $filePath
     for ($i = 0; $i -lt $lines.Length; $i++) {
         $line = $lines[$i]
+        $nextLine = $lines[$i + 1]
 
-        if ($line -match $datePattern) {
+        if ($line -match $datePattern -and !$nextLine.Contains("moved from") -and ($nextLine.Contains("moved to") -or $nextLine.Contains("from") -or $nextLine.Contains("picked up") -or $nextLine.Contains("dropped"))) {
             if ($Matches[5] -eq "[0, 0, 0]" -and ($directionSelection -eq "From" -or $directionSelection -eq "All")) {
                 $direction = "FROM"
             }
@@ -36,16 +39,19 @@ if ($steamId) {
             $name = $Matches[2]
             $PlayerID = $Matches[3]
             if ($i -lt $lines.Length - 1) {
-                $nextLine = $lines[$i + 1]
+                
 
                 if ($direction -eq "FROM") {
                     $pattern = $extraPatternFrom
+                    $pattern1 = $extraPatternFromPicked
                 }
                 elseif ($direction -eq "TO") {
                     $pattern = $extraPatternTo
+                    $pattern1 = $extraPatternToDropped
                 }
 
-                if ($nextLine -match $pattern) {
+                if ($nextLine -match $pattern -or $nextLine -match $pattern1) {
+                    $container = "ground"
                     $quantity = $Matches[1]
                     $item = $Matches[2]
                     $container = $Matches[3]
@@ -56,7 +62,7 @@ if ($steamId) {
                         Quantity  = $quantity
                         Item      = $item
                         Direction = $direction
-                        Container = $container
+                        Container = if ( $Container ) { $Container } else { "ground" }
         
                     }
                     $output += $entry
@@ -66,7 +72,7 @@ if ($steamId) {
 
     }
     $writefile = (Get-Item $filePath ).DirectoryName
-    $date = Get-Date �format 'yyyyMMdd_HHmmss'
+    $date = Get-Date -format 'yyyyMMdd_HHmmss'
     Write-Host ""
     Write-Host "Report saved to $writefile\$steamId-$date.txt"
     $output | Format-Table -AutoSize | Out-File "$writefile\\$steamId-$date.txt"
