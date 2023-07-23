@@ -84,11 +84,19 @@ if ($steamId) {
         catch [System.Exception] {          
         }
     }
+       
+    
     $writefile = (Get-Item $filePath ).DirectoryName
     $date = Get-Date -format 'yyyyMMdd_HHmmss'
     Write-Host ""
     Write-Host "Report saved to $writefile\$steamId-$date.txt"
     $output | Format-Table -AutoSize | Out-File "$writefile\\$steamId-$date.txt"
-    $output | Export-Csv -Path "$writefile\\$steamId-$date.csv" -NoTypeInformation
+    #ask if they want to export to csv
+    $export = [Microsoft.VisualBasic.Interaction]::MsgBox("Do you want to export to CSV?", "YesNo", "Export to CSV")
+    if ($export -eq "Yes") {
+        $output | Export-Csv -Path "$writefile\\$steamId-$date.csv" -NoTypeInformation
+        Write-Host "Report saved to $writefile\$steamId-$date.csv"
+    }
+    
     &notepad.exe "$writefile\\$steamId-$date.txt"
-}
+    
