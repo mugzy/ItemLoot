@@ -6,8 +6,19 @@ $steamId = 1
 [System.Reflection.Assembly]::LoadWithPartialName('Microsoft.VisualBasic') | Out-Null
 $steamId = [Microsoft.VisualBasic.Interaction]::InputBox("Players SteamID or 1 for all", "SteamID", "1")
 $directionSelection = [Microsoft.VisualBasic.Interaction]::InputBox("Enter All, To, or From", "Direction", "All")
+
+# Regex patterns
 $p1 = '(\[\d{2}\/\d{2} \d{2}:\d{2}:\d{2}\]) T:ItemMove(.*) S:(.*) (\[.*\]) T:.* (\[-?\d+(\.\d+)?, -?\d+(\.\d+)?, -?\d+(\.\d+)?\])'
 $p2 = '(\[\d{2}\/\d{2} \d{2}:\d{2}:\d{2}\]) T:ItemMove(.*) S:(' + $steamId + ') (\[.*\]) T:.* (\[-?\d+(\.\d+)?, -?\d+(\.\d+)?, -?\d+(\.\d+)?\])'
+$extraPatternFrom = 'Extra:(\d+)x (.+) (?<!moved )from (.+)'
+$extraPatternFromPicked = 'Extra:picked up (\d+)x (.*)'
+$extraPatternTo = 'Extra:(\d+)x (.+) moved to (.+)'
+$extraPatternToDropped = 'Extra:dropped (\d+)x (.*)'
+
+$date = $null
+$direction = $null
+$output = @()
+
 if ($steamId) {
     if ($steamId.length -ne 17) {
         $datePatternset = $p1
@@ -15,22 +26,15 @@ if ($steamId) {
     else {
         $datePatternset = $p2
     }
-    $extraPatternFrom = 'Extra:(\d+)x (.+) (?<!moved )from (.+)'
-    $extraPatternFromPicked = 'Extra:picked up (\d+)x (.*)'
-    $extraPatternTo = 'Extra:(\d+)x (.+) moved to (.+)'
-    $extraPatternToDropped = 'Extra:dropped (\d+)x (.*)'
-    $date = $null
-    $direction = $null
-    $output = @()
-
     $lines = Get-Content $filePath
+
     for ($i = 0; $i -lt $lines.Length; $i++) {
         $line = $lines[$i]
         $nextLine = $lines[$i + 1]
         $datePattern = $datePatternset
         try {
             if ($line -match $datePattern -or $nextLine.Contains($steamId)) {
-                <# Action to perform if the condition is true #>
+                
                 if ($steamId.length -ne 1 -and $nextLine.Contains($steamId)) {
                     $datePattern = $p1
                 }
@@ -89,8 +93,12 @@ if ($steamId) {
     $writefile = (Get-Item $filePath ).DirectoryName
     $date = Get-Date -format 'yyyyMMdd_HHmmss'
     Write-Host ""
+    $export = [Microsoft.VisualBasic.Interaction]::MsgBox("Do you want to export to TXT?", "YesNo", "Export to CSV")
+    if ($export -eq "Yes") {
     Write-Host "Report saved to $writefile\$steamId-$date.txt"
     $output | Format-Table -AutoSize | Out-File "$writefile\\$steamId-$date.txt"
+    }
+
     #ask if they want to export to csv
     $export = [Microsoft.VisualBasic.Interaction]::MsgBox("Do you want to export to CSV?", "YesNo", "Export to CSV")
     if ($export -eq "Yes") {
@@ -98,6 +106,7 @@ if ($steamId) {
         Write-Host "Report saved to $writefile\$steamId-$date.csv"
     }
     
-    &notepad.exe "$writefile\\$steamId-$date.txt"
+    #display $output using gridview
+    $output | Out-GridView
 }
     
