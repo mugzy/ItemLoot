@@ -93,12 +93,8 @@ if ($steamId) {
     $writefile = (Get-Item $filePath ).DirectoryName
     $date = Get-Date -format 'yyyyMMdd_HHmmss'
     Write-Host ""
-    $export = [Microsoft.VisualBasic.Interaction]::MsgBox("Do you want to export to TXT?", "YesNo", "Export to CSV")
-    if ($export -eq "Yes") {
     Write-Host "Report saved to $writefile\$steamId-$date.txt"
     $output | Format-Table -AutoSize | Out-File "$writefile\\$steamId-$date.txt"
-    }
-
     #ask if they want to export to csv
     $export = [Microsoft.VisualBasic.Interaction]::MsgBox("Do you want to export to CSV?", "YesNo", "Export to CSV")
     if ($export -eq "Yes") {
@@ -106,7 +102,8 @@ if ($steamId) {
         Write-Host "Report saved to $writefile\$steamId-$date.csv"
     }
     
-    #display $output using gridview
-    $output | Out-GridView
+    &notepad.exe "$writefile\\$steamId-$date.txt"
 }
-    
+else {
+    Write-Host "No SteamID entered"
+}
