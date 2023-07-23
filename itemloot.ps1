@@ -99,4 +99,5 @@ if ($steamId) {
     }
     
     &notepad.exe "$writefile\\$steamId-$date.txt"
+}
     
