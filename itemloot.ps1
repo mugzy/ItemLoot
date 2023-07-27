@@ -42,7 +42,7 @@ if ($steamId) {
                     if ($nextLine.Contains($steamId)) {
                         $line -match '(\[\d{2}\/\d{2} \d{2}:\d{2}:\d{2}\]) T:ItemMove(.*) S:(.*) (\[.*\]) T:.* (\[-?\d+(\.\d+)?, -?\d+(\.\d+)?, -?\d+(\.\d+)?\])'
                     }
-                    if ($Matches[5] -eq "[0, 0, 0]" -and ($directionSelection -eq "From" -or $directionSelection -eq "All")) {
+                    if ($Matches[5] -eq "[0, 0, 0]" -and ($directionSelection -eq "From" -or $directionSelection -eq "All") -and !$nextLine.Contains("dropped")) {
                         $direction = "FROM"
                     }
                     elseif ($directionSelection -eq "To" -or $directionSelection -eq "All") {
