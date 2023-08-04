@@ -94,7 +94,7 @@ if ($steamId) {
     $date = Get-Date -format 'yyyyMMdd_HHmmss'
     Write-Host ""
     Write-Host "Report saved to $writefile\$steamId-$date.txt"
-    $output | Format-Table -AutoSize | Out-File "$writefile\\$steamId-$date.txt"
+    $output | Format-Table -AutoSize | Out-File -Width 300 "$writefile\\$steamId-$date.txt"
     #ask if they want to export to csv
     $export = [Microsoft.VisualBasic.Interaction]::MsgBox("Do you want to export to CSV?", "YesNo", "Export to CSV")
     if ($export -eq "Yes") {
