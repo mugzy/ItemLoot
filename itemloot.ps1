@@ -22,7 +22,7 @@ $extraPatternToDropped = 'Extra:dropped (\d+)x (.*)'
 
 $scriptpath = Get-Location
 $itemlist = Import-Csv "$scriptpath\rust_items_full.csv"
-
+"Processing $filePath larger exports will take longer"
 
 function Get-RustItemID {
     param(
