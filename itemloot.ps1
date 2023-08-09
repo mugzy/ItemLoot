@@ -1,8 +1,8 @@
 Add-Type -AssemblyName System.Windows.Forms
 
 #editor: notepad.exe or notepad++.exe
-#$editor = "C:\Program Files\Notepad++\notepad++.exe"
-$editor = "notepad.exe"
+$editor = "C:\Program Files\Notepad++\notepad++.exe"
+#$editor = "notepad.exe"
 
 $FileBrowser = New-Object System.Windows.Forms.OpenFileDialog -Property @{ InitialDirectory = $MyInvocation.MyCommand.Path }
 $null = $FileBrowser.ShowDialog()
@@ -21,6 +21,11 @@ $extraPatternTo = 'Extra:(\d+)x (.+) moved to (.+)'
 $extraPatternToDropped = 'Extra:dropped (\d+)x (.*)'
 
 $scriptpath = Get-Location
+#If the csv file does not exist, download from https://github.com/mugzy/ItemLoot/blob/main/rust_items_full.csv
+if (!(Test-Path "$scriptpath\rust_items_full.csv")) {
+    $wc = New-Object System.Net.WebClient
+    $wc.DownloadFile("https://raw.githubusercontent.com/mugzy/ItemLoot/main/rust_items_full.csv", "$scriptpath\rust_items_full.csv")
+}
 $itemlist = Import-Csv "$scriptpath\rust_items_full.csv"
 "Processing $filePath larger exports will take longer"
 
