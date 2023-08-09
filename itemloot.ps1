@@ -143,6 +143,3 @@ if ($steamId) {
 else {
     Write-Host "No SteamID entered"
 }
-
-
-
