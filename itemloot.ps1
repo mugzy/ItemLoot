@@ -47,6 +47,9 @@ if ($steamId) {
     $lines = Get-Content $filePath
 
     for ($i = 0; $i -lt $lines.Length; $i++) {
+
+
+
         $line = $lines[$i]
         $nextLine = $lines[$i + 1]
         $datePattern = $datePatternset
@@ -69,7 +72,7 @@ if ($steamId) {
                     $name = $Matches[2]
                     $PlayerID = $Matches[3]
                     if ($i -lt $lines.Length - 1) {
-                    
+
     
                         if ($direction -eq "FROM") {
                             $pattern = $extraPatternFrom
@@ -81,6 +84,15 @@ if ($steamId) {
                         }
     
                         if ($nextLine -match $pattern -or $nextLine -match $pattern1) {
+
+                            $OuterLoopProgressParameters = @{
+                                Activity         = 'Parsing File'
+                                Status           = 'Progress->'
+                                PercentComplete  =  ($i / $lines.Length) * 100
+                                CurrentOperation = "Line $i of $($lines.Length)"
+                            }
+                            Write-Progress @OuterLoopProgressParameters
+                            
                             $container = "ground"
                             $quantity = $Matches[1]
                             $item = $Matches[2]
