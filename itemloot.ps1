@@ -7,6 +7,10 @@ $steamId = 1
 $steamId = [Microsoft.VisualBasic.Interaction]::InputBox("Players SteamID or 1 for all", "SteamID", "1")
 $directionSelection = [Microsoft.VisualBasic.Interaction]::InputBox("Enter All, To, or From", "Direction", "All")
 
+#editor: notepad.exe or notepad++.exe
+$editor = "C:\Program Files\Notepad++\notepad++.exe"
+#$editor = notepad.exe
+
 # Regex patterns 
 $p1 = '(\[\d{2}\/\d{2} \d{2}:\d{2}:\d{2}\]) T:ItemMove(.*) S:(.*) (\[.*\]) T:.* (\[-?\d+(\.\d+)?, -?\d+(\.\d+)?, -?\d+(\.\d+)?\])'
 $p2 = '(\[\d{2}\/\d{2} \d{2}:\d{2}:\d{2}\]) T:ItemMove(.*) S:(' + $steamId + ') (\[.*\]) T:.* (\[-?\d+(\.\d+)?, -?\d+(\.\d+)?, -?\d+(\.\d+)?\])'
@@ -14,6 +18,8 @@ $extraPatternFrom = 'Extra:(\d+)x (.+) (?<!moved )from (.+)'
 $extraPatternFromPicked = 'Extra:picked up (\d+)x (.*)'
 $extraPatternTo = 'Extra:(\d+)x (.+) moved to (.+)'
 $extraPatternToDropped = 'Extra:dropped (\d+)x (.*)'
+
+$itemlist = Import-Csv rust_items_full.csv
 
 $date = $null
 $direction = $null
@@ -68,6 +74,7 @@ if ($steamId) {
                             $container = "ground"
                             $quantity = $Matches[1]
                             $item = $Matches[2]
+                            $shortname = Get-RustItemID -ItemName $item
                             $container = $Matches[3]
                             $entry = [PSCustomObject]@{
                                 Date      = $date
@@ -75,11 +82,15 @@ if ($steamId) {
                                 Name      = $name
                                 Quantity  = $quantity
                                 Item      = $item
+                                Shortname    = $shortname
                                 Direction = $direction
+                                Command = "inventory.give $shortname $quantity"
                                 Container = if ( $Container ) { $Container } else { "ground" }
             
                             }
+                            
                             $output += $entry
+                            
                         }
                     }
                 }
@@ -94,7 +105,7 @@ if ($steamId) {
     $date = Get-Date -format 'yyyyMMdd_HHmmss'
     Write-Host ""
     Write-Host "Report saved to $writefile\$steamId-$date.txt"
-    $output | Format-Table -AutoSize | Out-File -Width 300 "$writefile\\$steamId-$date.txt"
+    $output | Format-Table -AutoSize | Out-String -Stream | Where-Object { $_.Trim() -ne "" } | Out-File -Width 300 "$writefile\\$steamId-$date.txt"
     #ask if they want to export to csv
     $export = [Microsoft.VisualBasic.Interaction]::MsgBox("Do you want to export to CSV?", "YesNo", "Export to CSV")
     if ($export -eq "Yes") {
@@ -102,8 +113,18 @@ if ($steamId) {
         Write-Host "Report saved to $writefile\$steamId-$date.csv"
     }
     
-    &notepad.exe "$writefile\\$steamId-$date.txt"
+    &$editor "$writefile\\$steamId-$date.txt"
 }
 else {
     Write-Host "No SteamID entered"
+}
+
+
+function Get-RustItemID {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$ItemName
+    )
+    
+    $itemlist | Where-Object { $_.Name -eq $ItemName } | Select-Object -ExpandProperty shortname
 }
