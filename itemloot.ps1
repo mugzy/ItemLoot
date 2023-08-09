@@ -30,7 +30,7 @@ function Get-RustItemID {
         [string]$ItemName
     )
     
-    $itemlist | Where-Object { $_.Name -eq $ItemName } | Select-Object -ExpandProperty shortname
+    $itemlist | Where-Object { $_.Name -eq $ItemName.Replace('?','-')} | Select-Object -ExpandProperty shortname
 }
 
 $date = $null
@@ -103,7 +103,7 @@ if ($steamId) {
                                 PlayerID  = $PlayerID
                                 Name      = $name
                                 Quantity  = $quantity
-                                Item      = $item
+                                Item      = $item.Replace('?','-')
                                 Direction = $direction
                                 Command = "inventory.give $shortname $quantity"
                                 Container = if ( $Container ) { $Container } else { "ground" }
