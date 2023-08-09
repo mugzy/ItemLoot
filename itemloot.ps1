@@ -2,7 +2,7 @@ Add-Type -AssemblyName System.Windows.Forms
 
 #editor: notepad.exe or notepad++.exe
 #$editor = "C:\Program Files\Notepad++\notepad++.exe"
-$editor = notepad.exe
+$editor = "notepad.exe"
 
 
 $FileBrowser = New-Object System.Windows.Forms.OpenFileDialog -Property @{ InitialDirectory = $MyInvocation.MyCommand.Path }
