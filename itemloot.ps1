@@ -1,4 +1,10 @@
 Add-Type -AssemblyName System.Windows.Forms
+
+#editor: notepad.exe or notepad++.exe
+$editor = "C:\Program Files\Notepad++\notepad++.exe"
+#$editor = notepad.exe
+
+
 $FileBrowser = New-Object System.Windows.Forms.OpenFileDialog -Property @{ InitialDirectory = $MyInvocation.MyCommand.Path }
 $null = $FileBrowser.ShowDialog()
 $filePath = $FileBrowser.FileName
@@ -7,9 +13,7 @@ $steamId = 1
 $steamId = [Microsoft.VisualBasic.Interaction]::InputBox("Players SteamID or 1 for all", "SteamID", "1")
 $directionSelection = [Microsoft.VisualBasic.Interaction]::InputBox("Enter All, To, or From", "Direction", "All")
 
-#editor: notepad.exe or notepad++.exe
-$editor = "C:\Program Files\Notepad++\notepad++.exe"
-#$editor = notepad.exe
+
 
 # Regex patterns 
 $p1 = '(\[\d{2}\/\d{2} \d{2}:\d{2}:\d{2}\]) T:ItemMove(.*) S:(.*) (\[.*\]) T:.* (\[-?\d+(\.\d+)?, -?\d+(\.\d+)?, -?\d+(\.\d+)?\])'
